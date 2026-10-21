@@ -1,0 +1,58 @@
+name: Test and build
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-only
+          MYSQL_DATABASE: student_test
+          MYSQL_USER: student
+          MYSQL_PASSWORD: ci-test-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-root-only"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: ruff check .
+      - name: SQLite tests
+        run: pytest -q
+      - name: MySQL integration tests
+        env:
+          TEST_DATABASE_URL: mysql+pymysql://student:ci-test-only@127.0.0.1:3306/student_test
+        run: pytest -q
+      - name: Train and independently evaluate
+        run: |
+          python -m ml.train_model
+          python -m ml.evaluate_model
+      - uses: actions/upload-artifact@v4
+        with:
+          name: model-evaluation
+          path: artifacts/metrics.json
+      - name: Build and smoke-test Docker image
+        run: |
+          docker build -t student-performance:ci .
+          docker run -d --name student-api -p 8000:8000 -e JWT_SECRET="$(openssl rand -hex 32)" student-performance:ci
+          for attempt in $(seq 1 30); do
+            if curl --fail http://127.0.0.1:8000/health; then break; fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:8000/health
+          python scripts/demo.py
+      - name: Docker logs
+        if: failure()
+        run: docker logs student-api || true
+      - name: Stop test container
+        if: always()
+        run: docker rm -f student-api || true

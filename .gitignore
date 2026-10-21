@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.test-tmp/
+.test-verified/
+*.db
+.env
+.env.*
+!.env.example
+.ruff_cache/
+artifacts/
+.test-*/
+*.log
