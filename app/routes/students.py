@@ -33,9 +33,12 @@ def create_student(body: StudentInput, db=Depends(get_db), user=Depends(current_
 
 
 @router.get("/students", response_model=list[StudentOut])
-def students(offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=100),
-             db=Depends(get_db), user=Depends(current_user)):
-    return db.scalars(select(Student).where(Student.owner_id == user.id).order_by(Student.id).offset(offset).limit(limit)).all()
+def students(
+    offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=100), db=Depends(get_db), user=Depends(current_user)
+):
+    return db.scalars(
+        select(Student).where(Student.owner_id == user.id).order_by(Student.id).offset(offset).limit(limit)
+    ).all()
 
 
 @router.get("/students/{student_id}", response_model=StudentOut)
@@ -68,9 +71,12 @@ def create_subject(body: SubjectInput, db=Depends(get_db), user=Depends(current_
 
 
 @router.get("/subjects", response_model=list[SubjectOut])
-def subjects(offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=100),
-             db=Depends(get_db), user=Depends(current_user)):
-    return db.scalars(select(Subject).where(Subject.owner_id == user.id).order_by(Subject.id).offset(offset).limit(limit)).all()
+def subjects(
+    offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=100), db=Depends(get_db), user=Depends(current_user)
+):
+    return db.scalars(
+        select(Subject).where(Subject.owner_id == user.id).order_by(Subject.id).offset(offset).limit(limit)
+    ).all()
 
 
 @router.get("/subjects/{subject_id}", response_model=SubjectOut)

@@ -19,18 +19,29 @@ def get_db(request: Request):
 def issue_token(user_id, settings):
     now = datetime.now(timezone.utc)
     return jwt.encode(
-        {"sub": str(user_id), "iat": now, "exp": now + timedelta(minutes=settings.access_token_minutes),
-         "iss": "student-performance", "aud": "student-api"},
-        settings.jwt_secret, algorithm="HS256",
+        {
+            "sub": str(user_id),
+            "iat": now,
+            "exp": now + timedelta(minutes=settings.access_token_minutes),
+            "iss": "student-performance",
+            "aud": "student-api",
+        },
+        settings.jwt_secret,
+        algorithm="HS256",
     )
 
 
 def current_user(request: Request, token: str = Depends(oauth2), db=Depends(get_db)):
     error = HTTPException(401, "Invalid or expired access token", headers={"WWW-Authenticate": "Bearer"})
     try:
-        data = jwt.decode(token, request.app.state.settings.jwt_secret, algorithms=["HS256"],
-                          issuer="student-performance", audience="student-api",
-                          options={"require": ["sub", "exp", "iat"]})
+        data = jwt.decode(
+            token,
+            request.app.state.settings.jwt_secret,
+            algorithms=["HS256"],
+            issuer="student-performance",
+            audience="student-api",
+            options={"require": ["sub", "exp", "iat"]},
+        )
         user_id = int(data["sub"])
     except (jwt.PyJWTError, ValueError, TypeError):
         raise error

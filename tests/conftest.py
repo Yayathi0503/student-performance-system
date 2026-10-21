@@ -46,8 +46,13 @@ def auth(client):
 
 @pytest.fixture
 def student_body():
-    return {"registration_number": "CS001", "name": "Asha", "department": "Computer Science",
-            "semester": 1, "email": "asha@example.com"}
+    return {
+        "registration_number": "CS001",
+        "name": "Asha",
+        "department": "Computer Science",
+        "semester": 1,
+        "email": "asha@example.com",
+    }
 
 
 @pytest.fixture

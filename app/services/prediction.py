@@ -24,6 +24,10 @@ def predict(artifact, features):
     model = artifact["model"]
     class_index = list(model.classes_).index(1)
     probability = float(model.predict_proba(frame)[0, class_index])
-    return {"needs_support": probability >= 0.5, "support_probability": round(probability, 4),
-            "model": artifact["name"], "training_data": "synthetic",
-            "notice": "Educational demonstration, not validated for real student decisions."}
+    return {
+        "needs_support": probability >= 0.5,
+        "support_probability": round(probability, 4),
+        "model": artifact["name"],
+        "training_data": "synthetic",
+        "notice": "Educational demonstration, not validated for real student decisions.",
+    }

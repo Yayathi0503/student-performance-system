@@ -36,5 +36,9 @@ def student_prediction(student_id: int, request: Request, db=Depends(get_db), us
         "internal_marks": sum(row.internal_marks for row in latest) / len(latest),
         "assignment_score": sum(row.assignment_score for row in latest) / len(latest),
     }
-    return {"student_id": student_id, "term": latest_term, "features": features,
-            **predict(request.app.state.model, features)}
+    return {
+        "student_id": student_id,
+        "term": latest_term,
+        "features": features,
+        **predict(request.app.state.model, features),
+    }

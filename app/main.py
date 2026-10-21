@@ -25,8 +25,12 @@ def create_app(settings=None):
         finally:
             engine.dispose()
 
-    api = FastAPI(title="Student Academic Performance API", version="1.0.0", lifespan=lifespan,
-                  description="Account-isolated academic records, analytics, and educational ML predictions.")
+    api = FastAPI(
+        title="Student Academic Performance API",
+        version="1.0.0",
+        lifespan=lifespan,
+        description="Account-isolated academic records, analytics, and educational ML predictions.",
+    )
     for router in (auth.router, students.router, academics.router, reports.router):
         api.include_router(router)
 

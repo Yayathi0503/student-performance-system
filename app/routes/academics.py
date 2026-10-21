@@ -31,10 +31,21 @@ def add_attendance(body: AttendanceInput, db=Depends(get_db), user=Depends(curre
 
 
 @router.get("/attendance", response_model=list[AttendanceOut])
-def list_attendance(student_id: int, offset: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=500),
-                    db=Depends(get_db), user=Depends(current_user)):
+def list_attendance(
+    student_id: int,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
+    db=Depends(get_db),
+    user=Depends(current_user),
+):
     owned(db, Student, student_id, user)
-    return db.scalars(select(Attendance).where(Attendance.student_id == student_id).order_by(Attendance.date, Attendance.id).offset(offset).limit(limit)).all()
+    return db.scalars(
+        select(Attendance)
+        .where(Attendance.student_id == student_id)
+        .order_by(Attendance.date, Attendance.id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
 
 
 @router.put("/attendance/{record_id}", response_model=AttendanceOut)
@@ -64,10 +75,21 @@ def add_record(body: RecordInput, db=Depends(get_db), user=Depends(current_user)
 
 
 @router.get("/academic-records", response_model=list[RecordOut])
-def list_records(student_id: int, offset: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=500),
-                 db=Depends(get_db), user=Depends(current_user)):
+def list_records(
+    student_id: int,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
+    db=Depends(get_db),
+    user=Depends(current_user),
+):
     owned(db, Student, student_id, user)
-    return db.scalars(select(AcademicRecord).where(AcademicRecord.student_id == student_id).order_by(AcademicRecord.term, AcademicRecord.id).offset(offset).limit(limit)).all()
+    return db.scalars(
+        select(AcademicRecord)
+        .where(AcademicRecord.student_id == student_id)
+        .order_by(AcademicRecord.term, AcademicRecord.id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
 
 
 @router.put("/academic-records/{record_id}", response_model=RecordOut)
